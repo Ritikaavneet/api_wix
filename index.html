@@ -1,60 +1,138 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>AI Style Advisor</title>
   <style>
     body {
-      font-family: sans-serif;
-      padding: 30px;
-      background: #f4f4f4;
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #fde9ec, #f9f0ff);
+      color: #333;
     }
-    .container {
-      background: white;
+
+    .hero-section {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    .text-area {
+      flex: 1;
+      min-width: 300px;
       padding: 20px;
-      max-width: 600px;
-      margin: auto;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
+
+    .text-area h1 {
+      font-size: 2.5rem;
+      color: #4a4a4a;
+      margin-bottom: 10px;
+    }
+
+    .text-area h2 {
+      font-size: 1.8rem;
+      color: #7b4bb7;
+      margin-bottom: 20px;
+    }
+
+    .text-area p {
+      font-size: 1.1rem;
+      line-height: 1.7;
+      color: #6b6b6b;
+    }
+
+    .upload-area {
+      flex: 1;
+      min-width: 300px;
+      background: #fdfcfc;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      padding: 30px;
+      max-width: 400px;
+      margin-top: 20px;
+    }
+
+    .upload-area h3 {
+      text-align: center;
+      color: #4a4a4a;
+      margin-bottom: 20px;
+    }
+
+    input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    button {
+      width: 100%;
+      background-color: #7b4bb7;
+      color: white;
+      padding: 12px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #6838a6;
+    }
+
     img {
       max-width: 100%;
-      margin-top: 10px;
+      margin-top: 20px;
       border-radius: 10px;
+      display: none;
     }
-    button {
-      padding: 10px 20px;
-      background: #4CAF50;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
+
     #results {
       margin-top: 20px;
-      white-space: pre-wrap;
-      background: #eef;
-      padding: 10px;
+      padding: 15px;
+      background: #f3f3ff;
       border-radius: 8px;
+      color: #444;
+      font-size: 14px;
+      white-space: pre-wrap;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Upload Your Image for Style Advice</h2>
-    <input type="file" id="imageInput" accept="image/*">
-    <img id="preview" style="display:none;" />
-    <br><br>
-    <button onclick="sendImage()">Get Style Advice</button>
-    <div id="results"></div>
+  <div class="hero-section">
+    <div class="text-area">
+      <h1>AI - Powered Color and <span style="color:#c05ec9;">Style Advisor</span></h1>
+      <h2>Discover Your Unique Style</h2>
+      <p>
+        Unlock the power of AI technology in color analysis and style recommendations.
+        Our AI-Powered Color and Style Advisor helps you find the perfect shades and
+        outfits tailored to your preferences. Simply upload a picture for analysis and
+        receive personalized suggestions to enhance your look effortlessly.
+      </p>
+    </div>
+
+    <div class="upload-area">
+      <h3>Upload Your Picture</h3>
+      <input type="file" id="imageInput" accept="image/*" />
+      <button onclick="sendImage()">Get Style Advice</button>
+      <img id="preview" />
+      <div id="results"></div>
+    </div>
   </div>
 
   <script>
-    // 🔁 Replace this with your latest ngrok URL each time you restart the server
-    const apiUrl = "https://4c24-34-135-110-154.ngrok-free.app/predict";
+    const apiUrl = "https://your-latest-ngrok-url.ngrok-free.app/predict";  // ⬅️ Replace this every time you restart ngrok
 
     function sendImage() {
       const input = document.getElementById("imageInput");
       const results = document.getElementById("results");
+      const preview = document.getElementById("preview");
 
       if (!input.files[0]) {
         alert("Please upload an image.");
@@ -65,9 +143,8 @@
       const reader = new FileReader();
 
       reader.onload = function (e) {
-        const img = document.getElementById("preview");
-        img.src = e.target.result;
-        img.style.display = "block";
+        preview.src = e.target.result;
+        preview.style.display = "block";
       };
       reader.readAsDataURL(file);
 
@@ -80,19 +157,20 @@
         method: "POST",
         body: formData
       })
-      .then(res => res.json())
-      .then(data => {
-        results.innerHTML = `
+        .then(res => res.json())
+        .then(data => {
+          results.innerHTML = `
 ✅ Face Shape: ${data.face_shape}
 ✅ Skin Tone: ${data.skin_tone}
 ✅ Hair Features: ${data.hair_features.join(", ")}
 🎨 Recommended Colors: ${data.recommended_colors.join(", ")}
-💍 Recommended Metal: ${data.recommended_metal}`;
-      })
-      .catch(err => {
-        console.error(err);
-        results.innerHTML = "❌ Something went wrong. Try again.";
-      });
+💍 Recommended Metal: ${data.recommended_metal}
+          `;
+        })
+        .catch(err => {
+          console.error(err);
+          results.innerHTML = "❌ Something went wrong. Please try again.";
+        });
     }
   </script>
 </body>
