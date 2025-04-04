@@ -16,7 +16,7 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start;
       padding: 40px 20px;
     }
 
@@ -100,7 +100,10 @@
       border-radius: 8px;
       color: #444;
       font-size: 14px;
-      white-space: pre-wrap;
+      white-space: normal;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
     }
 
     .color-tag {
@@ -110,7 +113,6 @@
       border-radius: 20px;
       font-weight: 500;
       font-size: 14px;
-      color: white;
     }
 
     .metal-dot {
@@ -121,6 +123,13 @@
       margin-left: 10px;
       vertical-align: middle;
       box-shadow: 0 0 6px rgba(0,0,0,0.2);
+    }
+
+    .color-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 8px;
     }
 
     .confetti {
@@ -163,11 +172,10 @@
   </div>
 
   <canvas id="confetti-canvas"></canvas>
-
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
   <script>
-    const apiUrl = "https://2e9e-34-106-172-63.ngrok-free.app/predict"; // Replace with current ngrok URL
+    const apiUrl = "https://2e9e-34-106-172-63.ngrok-free.app/predict"; // Replace every ngrok restart
 
     function sendImage() {
       const input = document.getElementById("imageInput");
@@ -197,59 +205,62 @@
         method: "POST",
         body: formData
       })
-        .then(res => res.json())
-        .then(data => {
-          const colorTags = data.recommended_colors.map(color => {
-            const bg = color.toLowerCase();
-            const isLight = isLightColor(bg);
-            return `<span class="color-tag" style="background:${bg};color:${isLight ? '#000' : '#fff'}">${color}</span>`;
-          }).join(" ");
+      .then(res => res.json())
+      .then(data => {
+        const colorTags = data.recommended_colors.map(color => {
+          const bg = color.toLowerCase();
+          const isLight = isLightColor(bg);
+          return `<span class="color-tag" style="background:${bg}; color:${isLight ? '#000' : '#fff'}">${color}</span>`;
+        }).join("");
 
-          const metalColorMap = {
-            "Gold": "#FFD700",
-            "Silver": "#C0C0C0",
-            "Platinum": "#E5E4E2",
-            "Mixed Metals": "linear-gradient(to right, gold, silver)"
-          };
+        const metalColorMap = {
+          "Gold": "#FFD700",
+          "Silver": "#C0C0C0",
+          "Platinum": "#E5E4E2",
+          "Mixed Metals": "linear-gradient(to right, gold, silver)"
+        };
 
-          const metal = data.recommended_metal;
-          const metalColor = metalColorMap[metal] || "gray";
-          const metalDotStyle = metalColor.startsWith("linear") 
-            ? `background: ${metalColor};` 
-            : `background-color: ${metalColor};`;
+        const metal = data.recommended_metal;
+        const metalColor = metalColorMap[metal] || "gray";
+        const metalDotStyle = metalColor.startsWith("linear") 
+          ? `background: ${metalColor};` 
+          : `background-color: ${metalColor};`;
 
-          results.innerHTML = `
-            <div>
-              🎨 <strong>Recommended Colors:</strong><br>${colorTags}
-            </div><br>
-            <div>
-              💍 <strong>Recommended Metal:</strong>
-              <span class="metal-dot" style="${metalDotStyle}"></span>
-              <span style="margin-left: 8px;">${metal}</span>
-            </div>
-          `;
+        results.innerHTML = `
+          <div>
+            🎨 <strong>Recommended Colors:</strong>
+            <div class="color-container">${colorTags}</div>
+          </div>
+          <div>
+            💍 <strong>Recommended Metal:</strong>
+            <span class="metal-dot" style="${metalDotStyle}"></span>
+            <span style="margin-left: 8px;">${metal}</span>
+          </div>
+        `;
 
-          fireConfetti(); // 🎉
-        })
-        .catch(err => {
-          console.error(err);
-          results.innerHTML = "❌ Something went wrong. Please try again.";
-        });
+        fireConfetti();
+      })
+      .catch(err => {
+        console.error(err);
+        results.innerHTML = "❌ Something went wrong. Please try again.";
+      });
     }
 
     function isLightColor(color) {
       const ctx = document.createElement("canvas").getContext("2d");
       ctx.fillStyle = color;
-      const rgb = ctx.fillStyle.match(/\d+/g).map(Number);
+      const rgb = ctx.fillStyle.match(/\d+/g)?.map(Number);
+      if (!rgb || rgb.length !== 3) return true;
       const brightness = (rgb[0]*299 + rgb[1]*587 + rgb[2]*114) / 1000;
-      return brightness > 180;
+      return brightness > 160;
     }
 
     function fireConfetti() {
       confetti({
-        particleCount: 150,
-        spread: 90,
-        origin: { y: 0.5 }
+        particleCount: 160,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#c05ec9', '#f9a8d4', '#bbf7d0', '#a5b4fc', '#fef08a']
       });
     }
   </script>
