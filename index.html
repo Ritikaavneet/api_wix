@@ -51,7 +51,7 @@
       border-radius: 12px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.1);
       padding: 30px;
-      max-width: 400px;
+      max-width: 420px;
       margin-top: 20px;
     }
 
@@ -99,9 +99,8 @@
       background: #f3f3ff;
       border-radius: 8px;
       color: #444;
-      font-size: 15px;
+      font-size: 14px;
       white-space: pre-wrap;
-      line-height: 1.6;
     }
 
     .color-tag {
@@ -122,6 +121,25 @@
       margin-left: 10px;
       vertical-align: middle;
       box-shadow: 0 0 6px rgba(0,0,0,0.2);
+    }
+
+    /* 🎉 Confetti */
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      background-color: #fceabb;
+      z-index: 9999;
+      pointer-events: none;
+      animation: fall 3s linear forwards;
+      border-radius: 50%;
+    }
+
+    @keyframes fall {
+      to {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+      }
     }
   </style>
 </head>
@@ -148,7 +166,7 @@
   </div>
 
   <script>
-    const apiUrl = "https://2e9e-34-106-172-63.ngrok-free.app/predict"; // Replace with live ngrok each time
+    const apiUrl = "https://2e9e-34-106-172-63.ngrok-free.app/predict"; // Update this every time
 
     function sendImage() {
       const input = document.getElementById("imageInput");
@@ -193,8 +211,8 @@
 
           const metal = data.recommended_metal;
           const metalColor = metalColorMap[metal] || "gray";
-          const metalDotStyle = metalColor.startsWith("linear")
-            ? `background: ${metalColor};`
+          const metalDotStyle = metalColor.startsWith("linear") 
+            ? `background: ${metalColor};` 
             : `background-color: ${metalColor};`;
 
           results.innerHTML = `
@@ -207,11 +225,26 @@
               <span style="margin-left: 8px;">${metal}</span>
             </div>
           `;
+
+          launchConfetti(); // 🎉
         })
         .catch(err => {
           console.error(err);
           results.innerHTML = "❌ Something went wrong. Please try again.";
         });
+    }
+
+    function launchConfetti() {
+      for (let i = 0; i < 60; i++) {
+        const confetti = document.createElement("div");
+        confetti.classList.add("confetti");
+        confetti.style.left = Math.random() * 100 + "vw";
+        confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 70%)`;
+        confetti.style.animationDuration = (Math.random() * 2 + 2) + "s";
+        confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+        document.body.appendChild(confetti);
+        setTimeout(() => confetti.remove(), 3000);
+      }
     }
   </script>
 </body>
