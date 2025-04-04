@@ -102,6 +102,26 @@
       font-size: 14px;
       white-space: pre-wrap;
     }
+
+    .color-tag {
+      display: inline-block;
+      margin: 6px 6px 0 0;
+      padding: 6px 14px;
+      border-radius: 20px;
+      color: white;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .metal-dot {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      margin-left: 10px;
+      vertical-align: middle;
+      box-shadow: 0 0 6px rgba(0,0,0,0.2);
+    }
   </style>
 </head>
 <body>
@@ -127,12 +147,12 @@
   </div>
 
   <script>
-    const apiUrl = "https://4c24-34-135-110-154.ngrok-free.app/predict";  // ⬅️ Replace this every time you restart ngrok
+    const apiUrl = "https://4c24-34-135-110-154.ngrok-free.app/predict"; // Replace each time you restart ngrok
 
     function sendImage() {
       const input = document.getElementById("imageInput");
-      const results = document.getElementById("results");
       const preview = document.getElementById("preview");
+      const results = document.getElementById("results");
 
       if (!input.files[0]) {
         alert("Please upload an image.");
@@ -159,12 +179,31 @@
       })
         .then(res => res.json())
         .then(data => {
+          const colorTags = data.recommended_colors.map(color =>
+            `<span class="color-tag" style="background:${color.toLowerCase()}">${color}</span>`
+          ).join(" ");
+
+          const metalColorMap = {
+            "Gold": "#FFD700",
+            "Silver": "#C0C0C0",
+            "Platinum": "#E5E4E2",
+            "Mixed Metals": "linear-gradient(to right, gold, silver)"
+          };
+
+          const metal = data.recommended_metal;
+          const metalColor = metalColorMap[metal] || "gray";
+          const metalDotStyle = metalColor.startsWith("linear") 
+            ? `background: ${metalColor};` 
+            : `background-color: ${metalColor};`;
+
           results.innerHTML = `
-✅ Face Shape: ${data.face_shape}
-✅ Skin Tone: ${data.skin_tone}
-✅ Hair Features: ${data.hair_features.join(", ")}
-🎨 Recommended Colors: ${data.recommended_colors.join(", ")}
-💍 Recommended Metal: ${data.recommended_metal}
+            <div>
+              🎨 <strong>Recommended Colors:</strong><br>${colorTags}
+            </div><br>
+            <div>
+              💍 <strong>Recommended Metal:</strong> ${metal}
+              <span class="metal-dot" style="${metalDotStyle}"></span>
+            </div>
           `;
         })
         .catch(err => {
