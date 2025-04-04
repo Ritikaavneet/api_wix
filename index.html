@@ -99,8 +99,9 @@
       background: #f3f3ff;
       border-radius: 8px;
       color: #444;
-      font-size: 14px;
+      font-size: 15px;
       white-space: pre-wrap;
+      line-height: 1.6;
     }
 
     .color-tag {
@@ -147,7 +148,7 @@
   </div>
 
   <script>
-    const apiUrl = "https://2e9e-34-106-172-63.ngrok-free.app/predict"; // Replace each time you restart ngrok
+    const apiUrl = "https://2e9e-34-106-172-63.ngrok-free.app/predict"; // Replace with live ngrok each time
 
     function sendImage() {
       const input = document.getElementById("imageInput");
@@ -192,8 +193,8 @@
 
           const metal = data.recommended_metal;
           const metalColor = metalColorMap[metal] || "gray";
-          const metalDotStyle = metalColor.startsWith("linear") 
-            ? `background: ${metalColor};` 
+          const metalDotStyle = metalColor.startsWith("linear")
+            ? `background: ${metalColor};`
             : `background-color: ${metalColor};`;
 
           results.innerHTML = `
@@ -201,8 +202,9 @@
               🎨 <strong>Recommended Colors:</strong><br>${colorTags}
             </div><br>
             <div>
-              💍 <strong>Recommended Metal:</strong> ${metal}
+              💍 <strong>Recommended Metal:</strong>
               <span class="metal-dot" style="${metalDotStyle}"></span>
+              <span style="margin-left: 8px;">${metal}</span>
             </div>
           `;
         })
