@@ -209,10 +209,10 @@
       .then(res => res.json())
       .then(data => {
         const colorTags = data.recommended_colors.map(color => {
-          const bg = color.toLowerCase();
-          const isLight = isLightColor(bg);
-          return `<span class="color-tag" style="background:${bg}; color:${isLight ? '#000' : '#fff'}">${color}</span>`;
+          const className = "color-" + color.toLowerCase().replace(/ /g, "-").replace(/_/g, "-");
+          return `<span class="color-tag ${className}">${color}</span>`;
         }).join("");
+
 
         const metalColorMap = {
           "Gold": "#FFD700",
